@@ -1,0 +1,36 @@
+name: Task reminders
+
+# When it runs:
+#  - every weekday at 08:00 Monterrey time (UTC-6  ->  14:00 UTC)
+#  - or manually from the Actions tab ("Run workflow" button)
+on:
+  schedule:
+    - cron: "0 14 * * 1-5"
+  workflow_dispatch:
+
+# Allows the Action to open/comment issues (that's where the mentions come from)
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    env:
+      # For the GitHub mention/notice
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      LEAD_DAYS: "3"   # how many days ahead it starts reminding
+
+      # For email (add these secrets in Settings -> Secrets -> Actions)
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}   # e.g. smtp.gmail.com
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}   # e.g. 587
+      SMTP_USER: ${{ secrets.SMTP_USER }}   # your email
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}   # app password (not your normal one)
+      MAIL_FROM: ${{ secrets.MAIL_FROM }}   # who it comes from (usually = SMTP_USER)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Check tasks and notify (issue + email)
+        run: python .github/scripts/notify.py

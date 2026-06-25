@@ -1,106 +1,164 @@
-# Technical Arts MTY · `notas`
+# Technical Arts MTY · `notes`
 
-Bitácora y documentación del capítulo, editable desde la terminal en cualquier
-computadora del grupo. Una sola herramienta: `notas`. La idea es que sea rápido —
-**escribes y se publica solo**.
+Chapter logbook and documentation, editable from the terminal on any member's
+computer. One tool: `notes`. The idea is to be fast — **you write and it
+publishes on its own**.
 
 ---
 
-## Proyectos activos
+## Active projects
 
-| Proyecto | Carpeta | Progreso |
+| Project | Folder | Progress |
 |---|---|---|
-| **DT-HRES** | `proyectos/DT-HRES/` | `PROGRESO.md` |
-| **Michelson Interferometer** | `proyectos/Michelson_Interferometer/` | `PROGRESO.md` |
+| **DT-HRES** | `projects/DT-HRES/` | `PROGRESS.md` |
+| **Michelson Interferometer** | `projects/Michelson_Interferometer/` | `PROGRESS.md` |
 
-Estado rápido en la terminal:
+Quick status in the terminal:
 
 ```
-notas proyectos
+notes projects
 ```
 
 ---
 
-## Inicio rápido
+## Quick start
 
 ```bash
-gh repo clone Technical-Arts-MTY/notas     # clonar (solo la primera vez)
+gh repo clone Technical-Arts-MTY/notas     # clone (first time only)
 cd notas
-python notas.py                            # abrir la interfaz
+python notes.py                            # open the interface
 ```
 
-Firma tus notas con tu nombre (una vez por computadora):
+Sign your notes with your name (once per computer):
 
 ```
-Windows :  set TA_AUTOR=German
-Unix    :  export TA_AUTOR=German
+Windows :  set TA_AUTHOR=German
+Unix    :  export TA_AUTHOR=German
 ```
 
-Para teclear solo `notas` (sin `python`): dentro de la carpeta ya funciona
-`notas` (Windows, vía `notas.bat`) o `./notas` (Mac/Linux). Para usarlo desde
-cualquier ruta, agrega esta carpeta a tu `PATH`.
+To type just `notes` (without `python`): inside the folder `notes` already works
+(Windows, via `notes.bat`) or `./notes` (Mac/Linux). To use it from anywhere, add
+this folder to your `PATH`.
 
 ---
 
-## Flujo de todos los días
+## Everyday flow
 
-**Una nota rápida y se publica al instante:**
+**A quick note, published instantly:**
 
 ```bash
-notas "arreglé el bug del display en Unity, queda pendiente el TMC2209"
+notes "fixed the Unity display bug, TMC2209 sourcing still pending"
 ```
 
-**O por menú:** `notas` → `[1] Escribir nota` → escribe → Enter. Hace
-`pull` + `commit` + `push` por ti.
+**Or via menu:** `notes` → `[1] Write note` → type → Enter. It does
+`pull` + `commit` + `push` for you.
 
 ---
 
-## Cierre de sesión → wiki
+## End of session → wiki
 
-Al terminar de trabajar (p. ej. en el interferómetro), documenta la sesión y
-súbela al wiki, ya con estándar de física:
+When you finish working (e.g. on the interferometer), document the session and
+push it to the wiki, already in physics standard:
 
 ```bash
-notas sesion
+notes session
 ```
 
-Pide proyecto, participantes, lo realizado, mediciones y pendientes; arma una
-página bien estructurada y la sube al **wiki** del repo.
+It asks for project, participants, what was done, measurements and pending items;
+builds a well-structured page and pushes it to the repo **wiki**.
 
-> La primera vez, abre el wiki una sola vez en GitHub (pestaña **Wiki →
-> Create the first page**, guarda). Después `notas sesion` ya escribe solo.
+> The first time, open the wiki once on GitHub (**Wiki → Create the first page**,
+> save). After that `notes session` writes on its own.
 
 ---
 
-## Citaciones (estándar de física)
+## Citations (physics standard)
 
 ```bash
-notas citar
+notes cite
 ```
 
-- **Medición:** registra magnitud, valor ± incertidumbre, **unidad SI**,
-  instrumento, **estado de calibración**, condiciones y método. Queda en
-  `proyectos/<proyecto>/mediciones.md`.
-- **Referencia:** genera una entrada **BibTeX** para tus reportes en LaTeX y la
-  agrega a `referencias.bib`.
+- **Measurement:** logs quantity, value ± uncertainty, **SI unit**, instrument,
+  **calibration state**, conditions and method. Stored in
+  `projects/<project>/measurements.md`.
+- **Reference:** generates a **BibTeX** entry for your LaTeX reports and adds it
+  to `references.bib`.
 
 ---
 
-## Estructura
+## Tasks and automatic reminders
+
+The task board lives inside the `notes` menu as **`[6] Tasks`**, and also as
+quick subcommands:
+
+```bash
+notes tasks            # show the task board
+notes tasks new        # add a task (to a role or a person)
+notes tasks done 3     # mark task #3 as finished
+```
+
+(There is also the standalone `tasks` command, equivalent.)
+
+Tasks live in `tasks.csv` and the team in `team.csv`. In `assignee` you put a
+GitHub username (`Aaron-Cuevas`) or a **role** (`role:Dir`), which resolves to
+whoever holds that role.
+
+### Reminders: GitHub mention + email
+
+The Action `.github/workflows/tasks.yml` runs every weekday (~8 a.m. Monterrey),
+checks due dates and, for what is **overdue or upcoming** (3 days by default),
+notifies the assignee in two ways:
+
+1. **Mention in an issue** (`@user`) → GitHub notification. Only needs the
+   person's `github` to be set correctly in `team.csv`.
+2. **Email** to the address in the `email` column of `team.csv`.
+
+**To enable email** add these secrets in the repo
+(Settings → Secrets and variables → Actions → New repository secret):
+
+| Secret | Value (Gmail example) |
+|---|---|
+| `SMTP_HOST` | `smtp.gmail.com` |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | `youremail@gmail.com` |
+| `SMTP_PASS` | an **app password** (not your normal one) |
+| `MAIL_FROM` | `youremail@gmail.com` |
+
+For Gmail, create the app password at
+`myaccount.google.com → Security → 2-Step Verification → App passwords`
+(requires 2FA on). Paste that 16-letter key into `SMTP_PASS`. Without these
+secrets, email is skipped and only the GitHub mention remains (nothing breaks).
+
+> Fill in each member's real `github` and `email` in `team.csv`: the mention
+> needs the username; the email needs the address.
+
+Tuning: the lead time (`LEAD_DAYS`) and the schedule (`cron`) are changed inside
+`.github/workflows/tasks.yml`. The cron uses UTC; `0 14 * * 1-5` ≈ 8:00 a.m.
+Monterrey, Monday to Friday.
+
+---
+
+## Structure
 
 ```
 notas/
-├── notas.py                 # la herramienta
-├── notas.bat / notas        # lanzadores (Windows / Unix)
+├── notes.py                 # the tool
+├── notes.bat / notes        # launchers (Windows / Unix)
+├── tasks.py                 # task board
+├── tasks.bat / tasks        # launchers
+├── team.csv · tasks.csv     # team (roles, emails) and tasks
 ├── README.md
-├── proyectos/
-│   ├── DT-HRES/             PROGRESO.md · mediciones.md
-│   └── Michelson_Interferometer/   PROGRESO.md · mediciones.md
-├── bitacora/               # notas diarias (YYYY-MM.md), se llenan solas
-├── guias/github.md         # cheat sheet de git/GitHub
-└── assets/
-    ├── logos/              # pon aquí los .png del capítulo
-    └── plantillas/         # plantilla-sesion.md · plantilla-medicion.md
+├── projects/
+│   ├── DT-HRES/             PROGRESS.md · measurements.md
+│   └── Michelson_Interferometer/   PROGRESS.md · measurements.md
+├── log/                    # daily notes (YYYY-MM.md), filled on their own
+├── guides/github.md        # git/GitHub cheat sheet
+├── assets/
+│   ├── logos/              # put the chapter .png files here
+│   └── templates/          # session-template.md · measurement-template.md
+└── .github/                # automation (reminders)
+    ├── workflows/tasks.yml
+    └── scripts/notify.py
 ```
 
 ---
@@ -108,33 +166,3 @@ notas/
 ## Roster
 
 Alfred RS · Aaron Dir · German GH · Edgar Mth · — · — · —
-
----
-
-## Labores y recordatorios automáticos
-
-Ventana de tareas del capítulo, editable desde la terminal, con **recordatorios
-que mencionan a la persona responsable según la fecha y el rol**.
-
-```bash
-labores               # ver la ventana de labores (pendientes por fecha)
-labores nueva         # dar de alta una tarea (asígnala a un rol o a una persona)
-labores hecho 3       # marcar la labor #3 como terminada
-```
-
-Las labores viven en `labores.csv` y el equipo en `equipo.csv`. En `asignar`
-puedes poner un usuario de GitHub (`Aaron-Cuevas`) o un **rol** (`rol:Dir`), que
-se resuelve a quien tenga ese rol en `equipo.csv`.
-
-**Las notificaciones** las manda la GitHub Action `.github/workflows/labores.yml`:
-cada día hábil revisa las fechas y, para lo **vencido o por vencer** (3 días por
-defecto), comenta en un issue mencionando a la persona (`@usuario`). Esa mención
-le llega como notificación de GitHub y correo. No requiere ningún secret.
-
-> Para que las menciones funcionen, pon el **usuario real de GitHub** de cada
-> integrante en `equipo.csv` (la columna `github`). Quien no lo tenga aparece en
-> el recordatorio por su nombre, pero sin notificación.
-
-Ajustes rápidos: el adelanto (`DIAS_AVISO`) y el horario (`cron`) se cambian
-dentro de `.github/workflows/labores.yml`. El cron usa UTC; `0 14 * * 1-5` ≈
-8:00 a.m. de Monterrey, lunes a viernes.
